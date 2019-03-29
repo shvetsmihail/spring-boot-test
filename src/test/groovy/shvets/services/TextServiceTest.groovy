@@ -1,10 +1,12 @@
 package shvets.services
 
 import spock.lang.Specification
+import spock.lang.Unroll
 
-class ServiceCharsTest extends Specification {
-    def service = new ServiceChars()
+class TextServiceTest extends Specification {
+    def service = new TextService()
 
+    @Unroll
     def "GetUniqueWordsCount"() {
         when:
         def result = service.getUniqueWordsCount(text)
@@ -15,10 +17,13 @@ class ServiceCharsTest extends Specification {
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
                 "Lorem ipsum dolor sit amet,consectetur adipiscing elit.",
                 "Lorem ipsum dolor sit amet,consectetur adipiscing    elit.s.   ",
+                "hello, my beautiful world!",
+                "Hello it`s me"
         ]
-        count << [8, 8, 9]
+        count << [8, 8, 9, 4, 3]
     }
 
+    @Unroll
     def "GetUniquePunctuationCount"() {
         when:
         def result = service.getUniquePunctuationCount(text)
@@ -29,8 +34,11 @@ class ServiceCharsTest extends Specification {
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
                 "Lorem ipsum dolor sit amet,, consectetur adipiscing elit.",
                 "Lorem ipsum dolor sit amet,, consectetur adipiscing elit.?!",
+                ",.!?:;-",
+                "Hello it`s me",
+                "no punctuation"
         ]
-        count << [2, 2, 4]
+        count << [2, 2, 4, 7, 0, 0]
     }
 
     def "GetReversedWords"() {
@@ -39,7 +47,13 @@ class ServiceCharsTest extends Specification {
         then:
         result == reversed
         where:
-        text << ["Lorem ipsum dolor sit amet, consectetur adipiscing elit."]
-        reversed << ["meroL muspi rolod tis tema, rutetcesnoc gnicsipida tile."]
+        text << [
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                "Hello it`s me"
+        ]
+        reversed << [
+                "meroL muspi rolod tis tema, rutetcesnoc gnicsipida tile.",
+                "olleH s`ti em"
+        ]
     }
 }
