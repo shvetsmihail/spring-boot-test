@@ -1,4 +1,4 @@
-###Smartling test app
+### Smartling test app
 
 build with maven:
 <pre>
