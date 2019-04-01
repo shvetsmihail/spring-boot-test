@@ -14,7 +14,6 @@ import shvets.services.TextService;
 @RestController
 @RequestMapping(value = "/api/v.1.0/text/",
         consumes = MediaType.TEXT_PLAIN_VALUE)
-
 public class TextController {
     private TextService textService;
 
@@ -28,7 +27,6 @@ public class TextController {
         validateRequest(text);
         String reversed = textService.getReversedWords(text);
         return new ResponseEntity<>(reversed, HttpStatus.OK);
-
     }
 
     @PostMapping(value = "/counts", produces = MediaType.APPLICATION_JSON_VALUE)

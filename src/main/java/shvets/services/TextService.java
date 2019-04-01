@@ -12,7 +12,6 @@ import java.util.stream.Stream;
 public class TextService {
     private static final String PUNCT_AND_SPACE_PATTERN = "[,.!?:;\\-\\p{Space}]";
     private static final String NOT_PUNCT_PATTERN = "[^,.!?:;\\-]";
-
     //ASCII from 0 to 127 char
     private static final String ENGLISH_PATTERN = "\\p{ASCII}";
 
@@ -24,6 +23,10 @@ public class TextService {
 
     public long getAllPunctuationCount(String message) {
         return message.replaceAll(NOT_PUNCT_PATTERN, "").length();
+    }
+
+    public boolean isEnglish(String text) {
+        return text.replaceAll(ENGLISH_PATTERN, "").length() == 0;
     }
 
     public String getReversedWords(String text) {
@@ -43,10 +46,6 @@ public class TextService {
             }
         }
         return reversedText.toString();
-    }
-
-    public boolean isEnglish(String text) {
-        return text.replaceAll(ENGLISH_PATTERN, "").length() == 0;
     }
 
     private List<Integer> getPucntOrSpaceIndexes(String text) {
