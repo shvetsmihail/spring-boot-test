@@ -22,9 +22,10 @@ class TextServiceTest extends Specification {
                 "Lorem ipsum dolor sit amet,consectetur adipiscing elit.",
                 "Lorem ipsum dolor sit amet,consectetur adipiscing    elit.s.   ",
                 "hello, my beautiful world!",
-                "Hello it`s me"
+                "Hello it`s me",
+                "\tfirst line,\n\tsecond line",
         ]
-        count << [8, 8, 9, 4, 3]
+        count << [8, 8, 9, 4, 3, 3]
     }
 
     @Unroll
@@ -40,9 +41,10 @@ class TextServiceTest extends Specification {
                 "Lorem ipsum dolor sit amet,, consectetur adipiscing elit.?!",
                 ",.!?:;-",
                 "Hello it`s me",
-                "no punctuation"
+                "no punctuation",
+                "\tfirst line,\n\tsecond line",
         ]
-        count << [2, 2, 4, 7, 0, 0]
+        count << [2, 2, 4, 7, 0, 0, 1]
     }
 
     def "GetReversedWords"() {
@@ -53,11 +55,17 @@ class TextServiceTest extends Specification {
         where:
         text << [
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                "Hello it`s me"
+                "Hello it`s me",
+                ". Hello, World",
+                "\tfirst line,\n\tsecond line",
+                " first line, \n second line",
         ]
         reversed << [
                 "meroL muspi rolod tis tema, rutetcesnoc gnicsipida tile.",
-                "olleH s`ti em"
+                "olleH s`ti em",
+                ". olleH, dlroW",
+                "\ttsrif enil,\n\tdnoces enil",
+                " tsrif enil, \n dnoces enil",
         ]
     }
 }

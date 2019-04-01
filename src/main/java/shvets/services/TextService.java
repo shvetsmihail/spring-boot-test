@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 @Service
 public class TextService {
-    private static final String PUNCT_AND_SPACE_PATTERN = "[,.!?:;\\- ]";
+    private static final String PUNCT_AND_SPACE_PATTERN = "[,.!?:;\\-\\p{Space}]";
     private static final String NOT_PUNCT_PATTERN = "[^,.!?:;\\-]";
 
     public long getUniqueWordsCount(String text) {
@@ -35,9 +35,7 @@ public class TextService {
         for (int i : indexes) {
             if (i == start) {
                 start = start + 1;
-                continue;
-            }
-            if (i > start) {
+            } else {
                 String word = text.substring(start, i);
                 String reversed = new StringBuffer(word).reverse().toString();
                 reversedText.replace(start, i, reversed);

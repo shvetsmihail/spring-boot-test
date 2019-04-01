@@ -29,11 +29,6 @@ public class TextController {
 
     @PostMapping(value = "/reversed", produces = {MediaType.TEXT_PLAIN_VALUE})
     public ResponseEntity<String> getReversedText(@RequestBody String text) {
-        if (text == null || text.isEmpty()) {
-            LOG.error("Status {}: empty body", HttpStatus.BAD_REQUEST);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Empty body");
-        }
-
         try {
             String reversed = textService.getReversedWords(text);
             return new ResponseEntity<>(reversed, HttpStatus.OK);
@@ -45,11 +40,16 @@ public class TextController {
 
     @PostMapping(value = "/counts", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TextCountResult> getTextCountResult(@RequestBody String text) {
-        TextCountResult textCountResult = new TextCountResult();
-        long uniqueWordsCount = textService.getUniqueWordsCount(text);
-        long uniquePunctuationCount = textService.getUniquePunctuationCount(text);
-        textCountResult.setUniqueWordsCount(uniqueWordsCount);
-        textCountResult.setUniquePunctuationCount(uniquePunctuationCount);
-        return new ResponseEntity<>(textCountResult, HttpStatus.OK);
+        try {
+            TextCountResult textCountResult = new TextCountResult();
+            long uniqueWordsCount = textService.getUniqueWordsCount(text);
+            long uniquePunctuationCount = textService.getUniquePunctuationCount(text);
+            textCountResult.setUniqueWordsCount(uniqueWordsCount);
+            textCountResult.setUniquePunctuationCount(uniquePunctuationCount);
+            return new ResponseEntity<>(textCountResult, HttpStatus.OK);
+        } catch (Exception e) {
+            LOG.error("Status {}: {}", HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+        }
     }
 }
