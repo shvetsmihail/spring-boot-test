@@ -24,7 +24,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private ResponseEntity<ErrorResponse> handleException(HttpStatus status, Exception ex) {
-        LOG.error("Status: {}, Reason: {}, Cause: {}", status, ex.getMessage(), ex);
+        LOG.error("Status: {}, Cause {}: {}", status, ex.getClass().getName(), ex.getMessage());
         ErrorResponse errorResponse = new ErrorResponse(status.value(), ex.getMessage());
         return new ResponseEntity<>(errorResponse, status);
     }
