@@ -29,9 +29,9 @@ class TextServiceTest extends Specification {
     }
 
     @Unroll
-    def "GetUniquePunctuationCount"() {
+    def GetAllPunctuationCount() {
         when:
-        def result = service.getUniquePunctuationCount(text)
+        def result = service.getAllPunctuationCount(text)
         then:
         result == count
         where:
@@ -44,7 +44,7 @@ class TextServiceTest extends Specification {
                 "no punctuation",
                 "\tfirst line,\n\tsecond line",
         ]
-        count << [2, 2, 4, 7, 0, 0, 1]
+        count << [2, 3, 5, 7, 0, 0, 1]
     }
 
     def "GetReversedWords"() {
@@ -67,5 +67,18 @@ class TextServiceTest extends Specification {
                 "\ttsrif enil,\n\tdnoces enil",
                 " tsrif enil, \n dnoces enil",
         ]
+    }
+
+    @Unroll
+    def "IsEnglish"() {
+        expect:
+        service.isEnglish(text) == result
+
+        where:
+        text << [
+                "\tHello World.\n It`s me, 27",
+                "\tПривет Мир.\n It`s me, 27"
+        ]
+        result << [true, false]
     }
 }

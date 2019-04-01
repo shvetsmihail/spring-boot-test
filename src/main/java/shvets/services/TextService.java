@@ -13,17 +13,17 @@ public class TextService {
     private static final String PUNCT_AND_SPACE_PATTERN = "[,.!?:;\\-\\p{Space}]";
     private static final String NOT_PUNCT_PATTERN = "[^,.!?:;\\-]";
 
+    //ASCII from 0 to 127 char
+    private static final String ENGLISH_PATTERN = "\\p{ASCII}";
+
     public long getUniqueWordsCount(String text) {
         return Stream.of(text.split(PUNCT_AND_SPACE_PATTERN))
                 .filter(s -> !s.isEmpty())
                 .distinct().count();
     }
 
-    public long getUniquePunctuationCount(String message) {
-        String onlyPunctuation = message.replaceAll(NOT_PUNCT_PATTERN, "");
-        return Stream.of(onlyPunctuation.split(""))
-                .filter(s -> !s.isEmpty())
-                .distinct().count();
+    public long getAllPunctuationCount(String message) {
+        return message.replaceAll(NOT_PUNCT_PATTERN, "").length();
     }
 
     public String getReversedWords(String text) {
@@ -43,6 +43,10 @@ public class TextService {
             }
         }
         return reversedText.toString();
+    }
+
+    public boolean isEnglish(String text) {
+        return text.replaceAll(ENGLISH_PATTERN, "").length() == 0;
     }
 
     private List<Integer> getPucntOrSpaceIndexes(String text) {

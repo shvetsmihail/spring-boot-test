@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
+import shvets.models.ErrorResponse
 import shvets.models.TextCountResult
 import shvets.services.TextService
 import spock.lang.Specification
@@ -31,19 +32,21 @@ class TextControllerTest extends Specification {
 
     def "GetReversedText OK"() {
         given:
-        when(service.getReversedWords("hello")).thenReturn("olleh")
+        def text = "Hello"
+        when(service.isEnglish(text)).thenReturn(true)
+        when(service.getReversedWords(text)).thenReturn("olleH")
 
         when:
         def response = mvc.perform(post(BASE_PATH + "reversed")
                 .contentType(MediaType.TEXT_PLAIN_VALUE)
-                .content("hello"))
+                .content(text))
                 .andExpect(status().isOk())
                 .andReturn().response
 
         then:
         response.status == 200
         MediaType.parseMediaType(response.contentType).equalsTypeAndSubtype(MediaType.TEXT_PLAIN)
-        response.contentAsString == "olleh"
+        response.contentAsString == "olleH"
     }
 
     def "GetReversedText when body is empty"() {
@@ -63,20 +66,52 @@ class TextControllerTest extends Specification {
 
     def "GetReversedText when TextService throw an exception"() {
         given:
-        when(service.getReversedWords("hello")).thenThrow(new RuntimeException("oops"))
+        def text = "Hello"
+        when(service.isEnglish(text)).thenReturn(true)
+        when(service.getReversedWords(text)).thenThrow(new RuntimeException("oops"))
 
-        expect:
-        mvc.perform(post(BASE_PATH + "reversed")
+        when:
+        def response = mvc.perform(post(BASE_PATH + "reversed")
                 .contentType(MediaType.TEXT_PLAIN_VALUE)
-                .content("hello"))
+                .content(text))
                 .andExpect(status().isInternalServerError())
-                .andReturn().response.errorMessage == "oops"
+                .andReturn().response
+
+        then:
+        response.status == 500
+        MediaType.parseMediaType(response.contentType).equalsTypeAndSubtype(MediaType.APPLICATION_JSON)
+        def jsonResult = response.contentAsString
+        def result = objectMapper.readValue(jsonResult, ErrorResponse)
+        result.statusCode == 500
+        result.errorMessage == "oops"
+    }
+
+    def "GetReversedText for non english text"() {
+        given:
+        def text = "Привет"
+        when(service.isEnglish(text)).thenReturn(false)
+
+        when:
+        def response = mvc.perform(post(BASE_PATH + "reversed")
+                .contentType(MediaType.TEXT_PLAIN_VALUE)
+                .content(text))
+                .andExpect(status().isBadRequest())
+                .andReturn().response
+
+        then:
+        response.status == 400
+        MediaType.parseMediaType(response.contentType).equalsTypeAndSubtype(MediaType.APPLICATION_JSON)
+        def jsonResult = response.contentAsString
+        def result = objectMapper.readValue(jsonResult, ErrorResponse)
+        result.statusCode == 400
+        result.errorMessage == "It`s not an english text"
     }
 
     def "GetTextCountResult OK"() {
         given:
         def text = "hello world! It's me."
-        when(service.getUniquePunctuationCount(text)).thenReturn(2L)
+        when(service.isEnglish(text)).thenReturn(true)
+        when(service.getAllPunctuationCount(text)).thenReturn(2L)
         when(service.getUniqueWordsCount(text)).thenReturn(4L)
 
         when:
@@ -91,7 +126,7 @@ class TextControllerTest extends Specification {
         MediaType.parseMediaType(response.contentType).equalsTypeAndSubtype(MediaType.APPLICATION_JSON)
         def jsonResult = response.contentAsString
         def result = objectMapper.readValue(jsonResult, TextCountResult)
-        result.uniquePunctuationCount == 2
+        result.allPunctuationCount == 2
         result.uniqueWordsCount == 4
     }
 
@@ -113,14 +148,23 @@ class TextControllerTest extends Specification {
     def "GetTextCountResult when TextService throw an exception"() {
         given:
         def text = "hello world! It's me."
-        when(service.getUniquePunctuationCount(text)).thenReturn(2L)
+        when(service.isEnglish(text)).thenReturn(true)
+        when(service.getAllPunctuationCount(text)).thenReturn(2L)
         when(service.getUniqueWordsCount(text)).thenThrow(new RuntimeException("oops"))
 
-        expect:
-        mvc.perform(post(BASE_PATH + "counts")
+        when:
+        def response = mvc.perform(post(BASE_PATH + "counts")
                 .contentType(MediaType.TEXT_PLAIN_VALUE)
                 .content(text))
                 .andExpect(status().isInternalServerError())
-                .andReturn().response.errorMessage == "oops"
+                .andReturn().response
+
+        then:
+        response.status == 500
+        MediaType.parseMediaType(response.contentType).equalsTypeAndSubtype(MediaType.APPLICATION_JSON)
+        def jsonResult = response.contentAsString
+        def result = objectMapper.readValue(jsonResult, ErrorResponse)
+        result.statusCode == 500
+        result.errorMessage == "oops"
     }
 }

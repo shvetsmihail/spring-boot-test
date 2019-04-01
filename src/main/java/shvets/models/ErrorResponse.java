@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TextCountResult {
-    private long uniqueWordsCount;
-    private long allPunctuationCount;
+public class ErrorResponse {
+    private int statusCode;
+    private String errorMessage;
 }
